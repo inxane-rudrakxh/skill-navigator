@@ -11,8 +11,8 @@ interface FormData {
 }
 
 export async function analyzeSkillsWithGemini(formData: FormData): Promise<ResultsData> {
-  // Using gemini-pro which has 100% fallback support across all API keys
-  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+  // Using gemini-2.5-flash as it is supported by the current API key
+  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
   const prompt = `
 You are an expert career coach and skill gap analyzer. Analyze the following candidate profile and return a JSON object ONLY (no markdown, no code fences, just raw JSON).
