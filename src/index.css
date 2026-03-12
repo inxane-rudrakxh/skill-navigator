@@ -1,0 +1,103 @@
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 10% 4%;
+    --foreground: 240 5% 90%;
+
+    --card: 240 10% 8%;
+    --card-foreground: 240 5% 90%;
+
+    --popover: 240 10% 8%;
+    --popover-foreground: 240 5% 90%;
+
+    --primary: 220 95% 65%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 240 10% 14%;
+    --secondary-foreground: 240 5% 90%;
+
+    --muted: 240 10% 14%;
+    --muted-foreground: 240 5% 55%;
+
+    --accent: 260 80% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 0 0% 100% / 0.1;
+    --input: 0 0% 100% / 0.1;
+    --ring: 220 95% 65%;
+
+    --radius: 1rem;
+
+    --glass: 0 0% 100% / 0.05;
+    --glass-border: 0 0% 100% / 0.1;
+    --glass-hover: 0 0% 100% / 0.08;
+    --glass-glow: 220 95% 65% / 0.3;
+
+    --sidebar-background: 240 10% 6%;
+    --sidebar-foreground: 240 5% 90%;
+    --sidebar-primary: 220 95% 65%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 10% 14%;
+    --sidebar-accent-foreground: 240 5% 90%;
+    --sidebar-border: 0 0% 100% / 0.1;
+    --sidebar-ring: 220 95% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-satoshi antialiased;
+    background-image: 
+      radial-gradient(ellipse at 10% 15%, hsl(260 80% 25% / 0.4), transparent 40%),
+      radial-gradient(ellipse at 90% 85%, hsl(220 80% 30% / 0.35), transparent 45%),
+      radial-gradient(ellipse at 50% 50%, hsl(240 60% 15% / 0.3), transparent 60%);
+    background-attachment: fixed;
+  }
+}
+
+@layer components {
+  .glass-card {
+    background: hsl(var(--glass));
+    border: 1px solid hsl(var(--glass-border));
+    border-radius: var(--radius);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    transition: all 300ms cubic-bezier(0.3, 0, 0, 1);
+  }
+
+  .glass-card-hover:hover {
+    background: hsl(var(--glass-hover));
+    box-shadow: 0 0 40px -10px hsl(var(--glass-glow));
+  }
+
+  .glass-input {
+    @apply w-full bg-transparent border border-border rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/80 transition-all duration-300;
+    background: hsl(var(--glass));
+  }
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(180deg, hsl(var(--foreground)), hsl(var(--muted-foreground)));
+  }
+}
+
+@layer utilities {
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+}
