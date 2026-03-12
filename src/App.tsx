@@ -14,6 +14,7 @@ import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import Profile from "@/pages/Profile";
 import DashboardPage from "@/pages/DashboardPage";
+import PortfolioBuilder from "@/pages/PortfolioBuilder";
 import Settings from "@/pages/Settings";
 import NotFound from "@/pages/NotFound";
 import type { ResultsData } from "@/components/Dashboard";
@@ -46,6 +47,7 @@ const App = () => {
                   <Route path="/register" element={<Register />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/dashboard" element={<DashboardPage data={resultsData} />} />
+                  <Route path="/portfolio-builder" element={<PortfolioBuilder data={resultsData} />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route
                     path="/analyzer"

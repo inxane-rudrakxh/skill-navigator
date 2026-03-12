@@ -1,4 +1,6 @@
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { ArrowRight, FileCode2 } from "lucide-react";
 import SkillTag from "./SkillTag";
 import RoadmapCard from "./RoadmapCard";
 import ProjectCard from "./ProjectCard";
@@ -28,6 +30,8 @@ const itemVariants = {
 };
 
 const Dashboard = ({ data }: DashboardProps) => {
+  const navigate = useNavigate();
+
   return (
     <motion.div
       variants={containerVariants}
@@ -77,6 +81,24 @@ const Dashboard = ({ data }: DashboardProps) => {
             <ProjectCard key={index} {...project} />
           ))}
         </div>
+      </motion.div>
+
+      {/* Portfolio Builder CTA */}
+      <motion.div variants={itemVariants} className="mt-16 flex flex-col items-center justify-center p-8 md:p-12 glass-card rounded-2xl text-center border-primary/20 bg-primary/5">
+        <FileCode2 className="w-12 h-12 text-primary mb-4" />
+        <h3 className="text-2xl md:text-3xl font-bold mb-3">Ready to build your presence?</h3>
+        <p className="text-muted-foreground max-w-lg mb-8">
+          Use your analysis data to instantly generate a sleek, professional portfolio page that you can share with recruiters.
+        </p>
+        <motion.button
+          onClick={() => navigate("/portfolio-builder")}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="group flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-8 py-4 rounded-lg transition-all duration-300 shadow-glow"
+        >
+          Generate Portfolio
+          <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+        </motion.button>
       </motion.div>
     </motion.div>
   );
