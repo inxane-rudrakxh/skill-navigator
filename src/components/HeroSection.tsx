@@ -10,7 +10,7 @@ const HeroSection = () => {
 
   const handleStartAnalysis = () => {
     if (user) {
-      navigate("/analyzer");
+      navigate("/dashboard");
     } else {
       navigate("/login");
     }

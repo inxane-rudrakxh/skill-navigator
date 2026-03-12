@@ -21,7 +21,7 @@ const Login = () => {
     setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate("/analyzer");
+      navigate("/dashboard");
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Login failed";
       toast({ title: "Login failed", description: message, variant: "destructive" });
@@ -32,7 +32,7 @@ const Login = () => {
   const handleGoogleLogin = async () => {
     try {
       await signInWithPopup(auth, googleProvider);
-      navigate("/analyzer");
+      navigate("/dashboard");
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Google login failed";
       toast({ title: "Google login failed", description: message, variant: "destructive" });

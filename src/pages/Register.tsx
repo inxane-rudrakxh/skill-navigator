@@ -41,7 +41,7 @@ const Register = () => {
       await createProfileDoc(user.uid, fullName, email);
       await refreshProfile();
       toast({ title: "Account created!", description: "Welcome! You're now signed in." });
-      navigate("/analyzer");
+      navigate("/dashboard");
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Registration failed";
       toast({ title: "Registration failed", description: message, variant: "destructive" });
@@ -63,7 +63,7 @@ const Register = () => {
         updated_at: serverTimestamp(),
       }, { merge: true });
       await refreshProfile();
-      navigate("/analyzer");
+      navigate("/dashboard");
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Google login failed";
       toast({ title: "Google login failed", description: message, variant: "destructive" });
