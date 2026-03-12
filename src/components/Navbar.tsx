@@ -1,14 +1,32 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Target, Menu, X, LogOut, LayoutDashboard, Settings, Compass, Home } from "lucide-react";
+import { Menu, X, LogOut, LayoutDashboard, Settings, Compass, Home, Sun, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window !== "undefined") {
+      return document.documentElement.classList.contains("dark") || !localStorage.getItem("theme");
+    }
+    return true;
+  });
+
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [isDark]);
+
+  const toggleTheme = () => setIsDark(!isDark);
 
   const handleLogout = async () => {
     await signOut();
@@ -33,7 +51,7 @@ const Navbar = () => {
       <nav className="container mx-auto max-w-7xl px-4 py-4">
         <div className="glass-card flex items-center justify-between px-6 py-3">
           <Link to="/" className="flex items-center gap-2">
-            <Target className="text-primary" size={28} />
+            <img src="/logo.png" alt="SkillGap AI Logo" className="w-9 h-9 object-contain rounded-full" />
             <span className="text-xl font-bold tracking-tighter text-foreground">
               SkillGap AI
             </span>
@@ -65,15 +83,30 @@ const Navbar = () => {
                 Logout
               </button>
             )}
+            <button
+              onClick={toggleTheme}
+              className="p-2 ml-2 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+              aria-label="Toggle Theme"
+            >
+              {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
           </div>
 
-          {/* Mobile hamburger */}
-          <button
-            className="md:hidden text-foreground"
-            onClick={() => setMobileOpen(!mobileOpen)}
-          >
-            {mobileOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          {/* Mobile hamburger & Theme */}
+          <div className="md:hidden flex items-center gap-2">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-full text-muted-foreground hover:text-foreground"
+            >
+              {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
+            <button
+              className="text-foreground"
+              onClick={() => setMobileOpen(!mobileOpen)}
+            >
+              {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile menu */}

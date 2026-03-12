@@ -10,6 +10,7 @@ import {
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db, googleProvider } from "@/integrations/firebase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Register = () => {
   const [fullName, setFullName] = useState("");
@@ -18,6 +19,7 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { refreshProfile } = useAuth();
 
   const createProfileDoc = async (uid: string, name: string, userEmail: string) => {
     await setDoc(doc(db, "profiles", uid), {
@@ -37,6 +39,7 @@ const Register = () => {
       const { user } = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(user, { displayName: fullName });
       await createProfileDoc(user.uid, fullName, email);
+      await refreshProfile();
       toast({ title: "Account created!", description: "Welcome! You're now signed in." });
       navigate("/analyzer");
     } catch (err: unknown) {
@@ -59,6 +62,7 @@ const Register = () => {
         created_at: serverTimestamp(),
         updated_at: serverTimestamp(),
       }, { merge: true });
+      await refreshProfile();
       navigate("/analyzer");
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Google login failed";

@@ -18,7 +18,12 @@ const Profile = () => {
   useEffect(() => {
     if (profile) {
       setFullName(profile.full_name || "");
-      setLinkedinUrl(profile.linkedin_url || "");
+      
+      // Smart: Strip the base URL so the user only sees their username
+      let ln = profile.linkedin_url || "";
+      ln = ln.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//i, "").replace(/\/$/i, "");
+      setLinkedinUrl(ln);
+      
       setTargetRole(profile.target_role || "");
     }
   }, [profile]);
@@ -29,9 +34,15 @@ const Profile = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
+      // Re-construct the full LinkedIn URL if they just entered a username
+      let finalLinkedinUrl = linkedinUrl.trim();
+      if (finalLinkedinUrl && !finalLinkedinUrl.startsWith("http")) {
+        finalLinkedinUrl = `https://linkedin.com/in/${finalLinkedinUrl.replace(/^\//, "")}`;
+      }
+
       await updateDoc(doc(db, "profiles", user.uid), {
         full_name: fullName,
-        linkedin_url: linkedinUrl,
+        linkedin_url: finalLinkedinUrl,
         target_role: targetRole,
         updated_at: serverTimestamp(),
       });
@@ -84,15 +95,20 @@ const Profile = () => {
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <Linkedin className="w-4 h-4" /> LinkedIn Profile URL
+              <Linkedin className="w-4 h-4 text-[#0A66C2]" /> LinkedIn Profile
             </label>
-            <input
-              type="url"
-              value={linkedinUrl}
-              onChange={(e) => setLinkedinUrl(e.target.value)}
-              className="glass-input"
-              placeholder="https://linkedin.com/in/username"
-            />
+            <div className="flex bg-background/50 border border-border rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-primary/50 transition-all">
+              <span className="flex items-center px-4 bg-muted/30 text-muted-foreground border-r border-border text-sm select-none">
+                linkedin.com/in/
+              </span>
+              <input
+                type="text"
+                value={linkedinUrl}
+                onChange={(e) => setLinkedinUrl(e.target.value)}
+                className="flex-1 bg-transparent px-4 py-3 outline-none text-foreground placeholder:text-muted-foreground text-sm"
+                placeholder="username"
+              />
+            </div>
           </div>
 
           <div className="space-y-2">

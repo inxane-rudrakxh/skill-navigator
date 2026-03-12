@@ -1,5 +1,6 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -15,13 +16,53 @@ const HeroSection = () => {
     }
   };
 
+  // Mouse parallax state
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const springConfig = { damping: 25, stiffness: 150 };
+  const springX = useSpring(mouseX, springConfig);
+  const springY = useSpring(mouseY, springConfig);
+
+  // Parallax transformations using useTransform
+  const translateX1 = useTransform(springX, [-1, 1], [-50, 50]);
+  const translateY1 = useTransform(springY, [-1, 1], [-50, 50]);
+  
+  const translateX2 = useTransform(springX, [-1, 1], [50, -50]);
+  const translateY2 = useTransform(springY, [-1, 1], [50, -50]);
+  
+  const translateX3 = useTransform(springX, [-1, 1], [-20, 20]);
+  const translateY3 = useTransform(springY, [-1, 1], [-20, 20]);
+  
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      // Normalize mouse coordinates to range [-1, 1]
+      const x = (e.clientX / window.innerWidth) * 2 - 1;
+      const y = (e.clientY / window.innerHeight) * 2 - 1;
+      mouseX.set(x);
+      mouseY.set(y);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [mouseX, mouseY]);
+
   return (
     <section className="relative min-h-screen flex items-center justify-center text-center px-6 pt-24 overflow-hidden">
-      {/* Animated background blobs */}
+      {/* Animated background blobs with Parallax */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full filter blur-3xl animate-blob" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/10 rounded-full filter blur-3xl animate-blob animation-delay-2000" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full filter blur-3xl animate-blob animation-delay-4000" />
+        <motion.div 
+          className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full filter blur-3xl animate-blob" 
+          style={{ translateX: translateX1, translateY: translateY1 }}
+        />
+        <motion.div 
+          className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/10 rounded-full filter blur-3xl animate-blob animation-delay-2000" 
+          style={{ translateX: translateX2, translateY: translateY2 }}
+        />
+        <motion.div 
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full filter blur-3xl animate-blob animation-delay-4000" 
+          style={{ translateX: translateX3, translateY: translateY3 }}
+        />
       </div>
 
       <motion.div

@@ -6,6 +6,47 @@
 
 @layer base {
   :root {
+    --background: 240 20% 98%;
+    --foreground: 240 10% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 10%;
+
+    --primary: 220 90% 55%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 240 10% 90%;
+    --secondary-foreground: 240 10% 10%;
+
+    --muted: 240 10% 94%;
+    --muted-foreground: 240 5% 45%;
+
+    --accent: 260 80% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 240 5% 85% / 0.5;
+    --input: 240 5% 85% / 0.5;
+    --ring: 220 90% 55%;
+
+    --radius: 1rem;
+
+    --glass: 0 0% 100% / 0.5;
+    --glass-border: 0 0% 0% / 0.05;
+    --glass-hover: 0 0% 100% / 0.8;
+    --glass-glow: 220 90% 55% / 0.15;
+
+    --blob-1: 260 80% 80% / 0.5;
+    --blob-2: 220 80% 85% / 0.45;
+    --blob-3: 240 60% 85% / 0.4;
+  }
+
+  .dark {
     --background: 240 10% 4%;
     --foreground: 240 5% 90%;
 
@@ -40,15 +81,10 @@
     --glass-border: 0 0% 100% / 0.1;
     --glass-hover: 0 0% 100% / 0.08;
     --glass-glow: 220 95% 65% / 0.3;
-
-    --sidebar-background: 240 10% 6%;
-    --sidebar-foreground: 240 5% 90%;
-    --sidebar-primary: 220 95% 65%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 10% 14%;
-    --sidebar-accent-foreground: 240 5% 90%;
-    --sidebar-border: 0 0% 100% / 0.1;
-    --sidebar-ring: 220 95% 65%;
+    
+    --blob-1: 260 80% 25% / 0.4;
+    --blob-2: 220 80% 30% / 0.35;
+    --blob-3: 240 60% 15% / 0.3;
   }
 }
 
@@ -60,10 +96,11 @@
   body {
     @apply bg-background text-foreground font-satoshi antialiased;
     background-image: 
-      radial-gradient(ellipse at 10% 15%, hsl(260 80% 25% / 0.4), transparent 40%),
-      radial-gradient(ellipse at 90% 85%, hsl(220 80% 30% / 0.35), transparent 45%),
-      radial-gradient(ellipse at 50% 50%, hsl(240 60% 15% / 0.3), transparent 60%);
+      radial-gradient(ellipse at 10% 15%, hsl(var(--blob-1)), transparent 40%),
+      radial-gradient(ellipse at 90% 85%, hsl(var(--blob-2)), transparent 45%),
+      radial-gradient(ellipse at 50% 50%, hsl(var(--blob-3)), transparent 60%);
     background-attachment: fixed;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 }
 
