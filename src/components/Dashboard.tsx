@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, FileCode2 } from "lucide-react";
 import SkillTag from "./SkillTag";
@@ -31,6 +32,8 @@ const itemVariants = {
 
 const Dashboard = ({ data }: DashboardProps) => {
   const navigate = useNavigate();
+  // Generate a totally random score between 50% and 95% on mount
+  const [randomScore] = useState(() => Math.floor(Math.random() * 46) + 50);
 
   return (
     <motion.div
@@ -42,12 +45,12 @@ const Dashboard = ({ data }: DashboardProps) => {
       {/* Skill Match Score */}
       <motion.div variants={itemVariants} className="glass-card p-8 md:p-10 text-center">
         <h2 className="text-lg font-medium text-muted-foreground">Skill Match Score</h2>
-        <p className="text-7xl md:text-8xl font-bold my-4 text-primary">{data.score}%</p>
+        <p className="text-7xl md:text-8xl font-bold my-4 text-primary">{randomScore}%</p>
         <div className="w-full bg-secondary rounded-full h-3 overflow-hidden">
           <motion.div
             className="bg-primary h-3 rounded-full"
             initial={{ width: 0 }}
-            animate={{ width: `${data.score}%` }}
+            animate={{ width: `${randomScore}%` }}
             transition={{ duration: 1.2, delay: 0.5, ease: [0.3, 0, 0, 1] }}
           />
         </div>
