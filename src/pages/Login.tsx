@@ -6,8 +6,9 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
 } from "firebase/auth";
-import { auth, googleProvider } from "@/integrations/firebase/client";
+import { auth, googleProvider, isFirebaseConfigured } from "@/integrations/firebase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -15,13 +16,32 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { refreshProfile } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      navigate("/dashboard");
+      if (!isFirebaseConfigured) {
+        localStorage.removeItem("skillgap_mock_logged_out");
+        localStorage.setItem("skillgap_mock_user", JSON.stringify({
+          uid: "demo-user-123",
+          email: email,
+          displayName: email.split("@")[0],
+        }));
+        localStorage.setItem("skillgap_mock_profile", JSON.stringify({
+          full_name: email.split("@")[0],
+          email: email,
+          linkedin_url: "",
+          target_role: "AI Engineer",
+        }));
+        await refreshProfile();
+        toast({ title: "Logged in (Demo Mode)" });
+        navigate("/dashboard");
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
+        navigate("/dashboard");
+      }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Login failed";
       toast({ title: "Login failed", description: message, variant: "destructive" });
@@ -31,8 +51,26 @@ const Login = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      await signInWithPopup(auth, googleProvider);
-      navigate("/dashboard");
+      if (!isFirebaseConfigured) {
+        localStorage.removeItem("skillgap_mock_logged_out");
+        localStorage.setItem("skillgap_mock_user", JSON.stringify({
+          uid: "demo-user-123",
+          email: "demo@skillgap.ai",
+          displayName: "Demo User",
+        }));
+        localStorage.setItem("skillgap_mock_profile", JSON.stringify({
+          full_name: "Demo User",
+          email: "demo@skillgap.ai",
+          linkedin_url: "linkedin.com/in/demouser",
+          target_role: "AI Engineer",
+        }));
+        await refreshProfile();
+        toast({ title: "Logged in with Google (Demo Mode)" });
+        navigate("/dashboard");
+      } else {
+        await signInWithPopup(auth, googleProvider);
+        navigate("/dashboard");
+      }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Google login failed";
       toast({ title: "Google login failed", description: message, variant: "destructive" });

@@ -2,7 +2,7 @@
 // Import firebase client like this:
 // import { auth, db } from "@/integrations/firebase/client";
 
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
@@ -15,8 +15,26 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
+export const isFirebaseConfigured = !!firebaseConfig.apiKey;
 
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const googleProvider = new GoogleAuthProvider();
+let app;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let auth: any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let db: any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let googleProvider: any;
+
+if (isFirebaseConfigured) {
+  app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+  auth = getAuth(app);
+  db = getFirestore(app);
+  googleProvider = new GoogleAuthProvider();
+} else {
+  console.warn("Firebase credentials are not set in environment variables. Running in Mock/Demo mode.");
+  auth = null;
+  db = null;
+  googleProvider = null;
+}
+
+export { auth, db, googleProvider };

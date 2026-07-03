@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { User, Mail, Linkedin, Briefcase, Save } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "@/integrations/firebase/client";
+import { db, isFirebaseConfigured } from "@/integrations/firebase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Navigate } from "react-router-dom";
 
@@ -40,14 +40,25 @@ const Profile = () => {
         finalLinkedinUrl = `https://linkedin.com/in/${finalLinkedinUrl.replace(/^\//, "")}`;
       }
 
-      await updateDoc(doc(db, "profiles", user.uid), {
-        full_name: fullName,
-        linkedin_url: finalLinkedinUrl,
-        target_role: targetRole,
-        updated_at: serverTimestamp(),
-      });
-      await refreshProfile();
-      toast({ title: "Profile updated!" });
+      if (!isFirebaseConfigured) {
+        localStorage.setItem("skillgap_mock_profile", JSON.stringify({
+          full_name: fullName,
+          email: user.email,
+          linkedin_url: finalLinkedinUrl,
+          target_role: targetRole,
+        }));
+        await refreshProfile();
+        toast({ title: "Profile updated (Demo Mode)!" });
+      } else {
+        await updateDoc(doc(db, "profiles", user.uid), {
+          full_name: fullName,
+          linkedin_url: finalLinkedinUrl,
+          target_role: targetRole,
+          updated_at: serverTimestamp(),
+        });
+        await refreshProfile();
+        toast({ title: "Profile updated!" });
+      }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Update failed";
       toast({ title: "Error", description: message, variant: "destructive" });

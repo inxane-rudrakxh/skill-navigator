@@ -5,7 +5,7 @@ import { Save, Linkedin, LogOut, KeyRound } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
-import { db, auth } from "@/integrations/firebase/client";
+import { db, auth, isFirebaseConfigured } from "@/integrations/firebase/client";
 import { useToast } from "@/hooks/use-toast";
 
 const ROLE_OPTIONS = [
@@ -44,15 +44,32 @@ const Settings = () => {
     if (!user) return;
     setSaving(true);
     try {
-      await updateDoc(doc(db, "profiles", user.uid), {
-        full_name: fullName,
-        email,
-        target_role: targetRole,
-        linkedin_url: linkedinUrl,
-        updated_at: serverTimestamp(),
-      });
-      await refreshProfile();
-      toast({ title: "Saved", description: "Profile updated successfully." });
+      if (!isFirebaseConfigured) {
+        localStorage.setItem("skillgap_mock_profile", JSON.stringify({
+          full_name: fullName,
+          email,
+          target_role: targetRole,
+          linkedin_url: linkedinUrl,
+        }));
+        const currentMockUser = JSON.parse(localStorage.getItem("skillgap_mock_user") || "{}");
+        localStorage.setItem("skillgap_mock_user", JSON.stringify({
+          ...currentMockUser,
+          email,
+          displayName: fullName,
+        }));
+        await refreshProfile();
+        toast({ title: "Saved (Demo Mode)", description: "Profile updated successfully." });
+      } else {
+        await updateDoc(doc(db, "profiles", user.uid), {
+          full_name: fullName,
+          email,
+          target_role: targetRole,
+          linkedin_url: linkedinUrl,
+          updated_at: serverTimestamp(),
+        });
+        await refreshProfile();
+        toast({ title: "Saved", description: "Profile updated successfully." });
+      }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Update failed";
       toast({ title: "Error", description: message, variant: "destructive" });
@@ -63,6 +80,12 @@ const Settings = () => {
   const handleUpdatePassword = async () => {
     if (!newPassword || newPassword.length < 6) {
       toast({ title: "Error", description: "Password must be at least 6 characters.", variant: "destructive" });
+      return;
+    }
+    if (!isFirebaseConfigured) {
+      setCurrentPassword("");
+      setNewPassword("");
+      toast({ title: "Updated (Demo Mode)", description: "Password changed successfully." });
       return;
     }
     const currentUser = auth.currentUser;

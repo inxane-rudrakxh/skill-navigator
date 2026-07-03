@@ -8,7 +8,7 @@ import {
   signInWithPopup,
 } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
-import { auth, db, googleProvider } from "@/integrations/firebase/client";
+import { auth, db, googleProvider, isFirebaseConfigured } from "@/integrations/firebase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -36,12 +36,30 @@ const Register = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const { user } = await createUserWithEmailAndPassword(auth, email, password);
-      await updateProfile(user, { displayName: fullName });
-      await createProfileDoc(user.uid, fullName, email);
-      await refreshProfile();
-      toast({ title: "Account created!", description: "Welcome! You're now signed in." });
-      navigate("/dashboard");
+      if (!isFirebaseConfigured) {
+        localStorage.removeItem("skillgap_mock_logged_out");
+        localStorage.setItem("skillgap_mock_user", JSON.stringify({
+          uid: "demo-user-123",
+          email: email,
+          displayName: fullName,
+        }));
+        localStorage.setItem("skillgap_mock_profile", JSON.stringify({
+          full_name: fullName,
+          email: email,
+          linkedin_url: "",
+          target_role: "AI Engineer",
+        }));
+        await refreshProfile();
+        toast({ title: "Account created! (Demo Mode)", description: "Welcome! You're now signed in." });
+        navigate("/dashboard");
+      } else {
+        const { user } = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(user, { displayName: fullName });
+        await createProfileDoc(user.uid, fullName, email);
+        await refreshProfile();
+        toast({ title: "Account created!", description: "Welcome! You're now signed in." });
+        navigate("/dashboard");
+      }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Registration failed";
       toast({ title: "Registration failed", description: message, variant: "destructive" });
@@ -51,19 +69,36 @@ const Register = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      const { user } = await signInWithPopup(auth, googleProvider);
-      // Create profile doc if it doesn't exist yet
-      const profileRef = doc(db, "profiles", user.uid);
-      await setDoc(profileRef, {
-        full_name: user.displayName ?? "",
-        email: user.email ?? "",
-        linkedin_url: null,
-        target_role: null,
-        created_at: serverTimestamp(),
-        updated_at: serverTimestamp(),
-      }, { merge: true });
-      await refreshProfile();
-      navigate("/dashboard");
+      if (!isFirebaseConfigured) {
+        localStorage.removeItem("skillgap_mock_logged_out");
+        localStorage.setItem("skillgap_mock_user", JSON.stringify({
+          uid: "demo-user-123",
+          email: "demo@skillgap.ai",
+          displayName: "Demo User",
+        }));
+        localStorage.setItem("skillgap_mock_profile", JSON.stringify({
+          full_name: "Demo User",
+          email: "demo@skillgap.ai",
+          linkedin_url: "linkedin.com/in/demouser",
+          target_role: "AI Engineer",
+        }));
+        await refreshProfile();
+        navigate("/dashboard");
+      } else {
+        const { user } = await signInWithPopup(auth, googleProvider);
+        // Create profile doc if it doesn't exist yet
+        const profileRef = doc(db, "profiles", user.uid);
+        await setDoc(profileRef, {
+          full_name: user.displayName ?? "",
+          email: user.email ?? "",
+          linkedin_url: null,
+          target_role: null,
+          created_at: serverTimestamp(),
+          updated_at: serverTimestamp(),
+        }, { merge: true });
+        await refreshProfile();
+        navigate("/dashboard");
+      }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Google login failed";
       toast({ title: "Google login failed", description: message, variant: "destructive" });

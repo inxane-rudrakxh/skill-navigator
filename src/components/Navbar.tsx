@@ -3,6 +3,7 @@ import { Menu, X, LogOut, LayoutDashboard, Settings, Compass, Home, Sun, Moon } 
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
+import { isFirebaseConfigured } from "@/integrations/firebase/client";
 
 const Navbar = () => {
   const location = useLocation();
@@ -48,6 +49,11 @@ const Navbar = () => {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
+      {!isFirebaseConfigured && (
+        <div className="bg-yellow-500/10 border-b border-yellow-500/20 text-yellow-500 dark:text-yellow-200 text-xs py-1.5 px-4 text-center backdrop-blur-md font-medium tracking-wide">
+          ⚠️ Running in Demo/Mock Mode. Firebase API keys are not set. Profiles will persist in your browser.
+        </div>
+      )}
       <nav className="container mx-auto max-w-7xl px-4 py-4">
         <div className="glass-card flex items-center justify-between px-6 py-3">
           <Link to="/" className="flex items-center gap-2">
